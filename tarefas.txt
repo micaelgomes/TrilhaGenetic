@@ -1,0 +1,18 @@
+1 - definir como separar possibiliddes impossiveis para o estado atual do jogo.
+    Pré-requisitos:
+    - saber qual etapa do jogo se está (alocação, movimentação simples, movimentação com vôo)
+    Obs.: é possivel que um jogo chegue ao fim sem um jogador chegar a etapa de movimentação com vôo
+    
+    Soluções possiveis:
+    a - Retirar apos a conclusao de busca, e reiniciar uma nova busca mantendo os casos possiveis ja encontrados
+    b - Retirar apos cada geração
+    c - implementar uma cruzamentos que habilitam apenas casos possiveis
+
+2 - Estabelecer as probabilidades de :
+    - locus no crossover
+    - locus na mutação
+
+    Soluções possiveis:
+    a - estabelecer quantidade de locus reduzida, e manter probabilidades iguais
+    b - estabelecer quantidade de locus reduzida, e manter probabilidades diferentes
+
