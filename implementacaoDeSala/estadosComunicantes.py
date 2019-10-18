@@ -12,6 +12,7 @@ def inicilaizarMatriz():
                 matriz[a][b] = digitValid(a, b)
         firstRead = True
     print(matriz)
+    stateAcessible(matriz)
 
 def digitValid(ind_1, ind_2):
     while True:
@@ -31,6 +32,25 @@ def isStochastic(mat, linha, flagFirst):
         print(' --- Atencao, a soma das probabilidades de uma linha devem ser iguais a 1! --- ')
         return False
     return True
+
+def stateAcessible(matriz):
+    num_states = matriz.shape[0]
+    for a in range(num_states):
+        for b in range(num_states):
+            if a != b:
+                print(' iniciando busca de %i para %i' %(a, b))
+                isAcessible(a,'-> ', b, matriz)
+
+
+def isAcessible(start, between ,goal, matriz):
+    if start == goal: 
+        print('Acessivel atraves dos estados %s' %(between))
+        return True
+    for b in range(matriz.shape[0]):
+        #print(' %i, %i, %f' %(b,goal, matriz[b][goal]))
+        if start != b and matriz[start][b] > 0 and matriz[b][goal] > 0 : 
+            aux = between + ', ' + str(b)
+            isAcessible(b, aux, goal, matriz)
 
 
 if __name__ == "__main__":
