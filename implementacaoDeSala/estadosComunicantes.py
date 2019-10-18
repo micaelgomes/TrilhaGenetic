@@ -11,8 +11,7 @@ def inicilaizarMatriz():
             for b in range(tam):
                 matriz[a][b] = digitValid(a, b)
         firstRead = True
-    print(matriz)
-    stateAcessible(matriz)
+    return matriz
 
 def digitValid(ind_1, ind_2):
     while True:
@@ -33,33 +32,52 @@ def isStochastic(mat, linha, flagFirst):
         return False
     return True
 
-def stateAcessible(matriz):
+def stateAcessible(matriz, mat_result):
     num_states = matriz.shape[0]
     for a in range(num_states):
         for b in range(num_states):
             if a != b:
-                print(' iniciando busca de %i para %i' %(a, b))
-                isAcessible(a,'-> ', b, matriz)
+                text = '{}'.format(a)
+                isAcessible(a, a, b, text, matriz, mat_result, num_states)
 
 
-def isAcessible(start, between ,goal, matriz):
-    if start == goal: 
-        print('Acessivel atraves dos estados %s' %(between))
-        return True
+def isAcessible(start, actual, goal, text, matriz, mat_result, count):
+    if actual == goal: 
+        print('(%i -> %i) atraves de: (%s)' %(start, actual, text))
+        mat_result[start][actual] = 'S'
+        return
+    if count == 0 : return
+
+    count -= 1
     for b in range(matriz.shape[0]):
-        #print(' %i, %i, %f' %(b,goal, matriz[b][goal]))
-        if start != b and matriz[start][b] > 0 and matriz[b][goal] > 0 : 
-            aux = between + ', ' + str(b)
-            isAcessible(b, aux, goal, matriz)
+        if actual != b and matriz[actual][b] > 0 and matriz[b][goal] > 0 : 
+            text = text + ', ' + str(b)
+            isAcessible(start, b, goal, text, matriz, mat_result, count)
 
+def isComunicated(mat):
+    for a in range(len(mat[0])):
+        for b in range(len(mat[0])):
+            if mat[a][b] == 'S' and mat[b][a] == 'S':
+                print('(%i <-> %i)'%(a,b))
+
+def initMatResult(matriz):
+    result = []
+    for a in range(matriz.shape[0]):
+        result.append([])
+        for b in range(matriz.shape[0]):
+            result[a].append('-')
+    return result
 
 if __name__ == "__main__":
-    inicilaizarMatriz()
-    '''
-    x = int(-1)
-    y = int(2.8)
-    z = int("3")
-    print(x)
-    print(y)
-    print(z)
-    '''
+    mat = inicilaizarMatriz()
+    resultado = initMatResult(mat)
+    #multiplicando a matriz 5 vezes
+    for p in range(5):
+        mat = np.dot(mat,mat)
+    print('matriz final')
+    print(mat)
+    print('         1) Estados Acessiveis:    ')
+    stateAcessible(mat, resultado)
+    print('         2) Estados Comunicantes:   ')
+    isComunicated(resultado)
+    
