@@ -11,14 +11,10 @@ cromossomo -> jogada atual, simulada por um matriz
 
 import sys, pygame
 from controller import Controller
-import time
+from genetic import getChromosome
 
 # Iniciando o jogo e definindo título da Janela
 pygame.init()
-pygame.display.set_caption('Trilha')
-
-# tempo inicial
-deltaTime = int(round(time.time() * 1000)) 
 
 # Definindo Icone do Jogo
 icon = pygame.image.load('assets/ico.png')
@@ -31,17 +27,20 @@ screen = pygame.display.set_mode(size)
 # imagem do tabuleiro
 # tabuleiro = pygame.image.load('assets/tab.png')
 if len(sys.argv) > 1:
+    pygame.display.set_caption('Trilha - debug mode')
     tabuleiro = pygame.image.load('assets/tab_mark.png')
 else:
+    pygame.display.set_caption('Trilha')
     tabuleiro = pygame.image.load('assets/tab.png')
     
 # objetos do jogo: marcador, peça situação e oposiçãos
+mark = {'img': pygame.image.load('assets/mark.png'), 'x': -30, 'y': -30}
 red  = {'img': pygame.image.load('assets/red.png'), 'x': -60, 'y': -60}
 dark = {'img': pygame.image.load('assets/dark.png'), 'x': -60, 'y': -60}
-mark = {'img': pygame.image.load('assets/mark.png'), 'x': -30, 'y': -30}
 
 # estilo do jogo
-myfont = pygame.font.SysFont('assests/modak.ttf', 30)
+fontSize = 40
+myfont = pygame.font.Font('assets/lobster.ttf', fontSize)
 stringPlayer = myfont.render('Sua Vez!', False, (0, 0, 0))
 stringMachine = myfont.render('Aguarde...', False, (0, 0, 0))
 
@@ -53,38 +52,15 @@ table = Controller()
 table.turnPlayer = True
 
 # número pra desenhar fora da tela
-numOutScreen = -30
+numOutScreen = -100
 
-# flag de controle do jogo
-run = True
+# render mark
+def renderMark():
+    positionNotFree = table.getMark(mouse_x, mouse_y)
+    beFree = getChromosome()[positionNotFree] != 0 
+    print('beFree -> ', beFree, 'pos -- ', positionNotFree)
 
-while run:
-    
-    # atualizando o tempo
-    deltaTime = int(round(time.time() * 1000)) - deltaTime
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: sys.exit()
-
-    mouse = mouse_x, mouse_y = pygame.mouse.get_pos()
-    mouse_click = pygame.mouse.get_pressed()
-
-    if mouse_click != (0,0,0) and deltaTime > 1000000: 
-        print(mouse, ' -> ', table.getMark(mouse_x, mouse_y))
-
-        deltaTime = 0
-
-        if table.turnPlayer:
-            red['x'] = table.getX(mouse_x) - 20 
-            red['y'] = table.getY(mouse_y) - 20 
-        else:
-            dark['x'] = table.getX(mouse_x) - 20    
-            dark['y'] = table.getY(mouse_y) - 20    
-
-        table.turnPlayer = not table.turnPlayer
-        table.turnMachine = not table.turnMachine
-
-    if table.match(mouse_x, mouse_y):
+    if table.match(mouse_x, mouse_y) and beFree:
         mark['x'] = table.getX(mouse_x)
         mark['y'] = table.getY(mouse_y)
 
@@ -92,15 +68,42 @@ while run:
         mark['x'] = numOutScreen
         mark['y'] = numOutScreen
 
-    screen.blit(tabuleiro, (0,0))
+# render peças
+def render(qtd_pieces, pieces):
+    diff = 35
+
+    for i in range(qtd_pieces):
+        if pieces[i] == 1:
+            position = table.getMarkPosition(i+1)
+            screen.blit(red['img'], (position[0]-diff, position[1]-diff))
+        
+        elif pieces[i] == 2:
+            position = table.getMarkPosition(i+1)
+            screen.blit(dark['img'], (position[0]-diff, position[1]-diff))
+
+
+# flag de controle do jogo
+run = True
+
+while run:
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: sys.exit()
+
+    mouse = mouse_x, mouse_y = pygame.mouse.get_pos()
+    mouse_click = pygame.mouse.get_pressed()
     
-    if table.turnPlayer:
-        screen.blit(stringPlayer,(tabuleiro.get_width()-150, 50))
-    else:
-        screen.blit(stringMachine,(tabuleiro.get_width()-150, 50))
+    if mouse_click != (0,0,0) : 
+        print(mouse, ' -> ', table.getMark(mouse_x, mouse_y))
+
+    screen.blit(tabuleiro, (0,0))
+
+    # função que renderiza as peças do jogo
+    render(27, getChromosome())
+    
+    # função que renderiza o marcador
+    renderMark()
 
     screen.blit(mark['img'], (mark['x'], mark['y']))
-    screen.blit(red['img'], (red['x'], red['y']))
-    screen.blit(dark['img'], (dark['x'], dark['y']))
-    
+    screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
     pygame.display.flip()

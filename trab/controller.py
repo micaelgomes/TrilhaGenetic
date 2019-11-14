@@ -10,13 +10,18 @@ class Controller:
         inv = -30
 
         # Configurações gerais
-        self.points = [[inv, inv], [61, 63], [140, 146], [220, 229], [300, 63], [300, 146], [300, 219], [540, 63], [461, 146], [382, 229], [61, 304], [140, 304], [220, 304], [inv, inv], [inv, inv], [inv, inv], [381, 304], [460, 304], [538, 304], [61, 539], [140, 461], [220, 380], [300, 539], [300, 461], [300, 380], [540, 539], [461, 461], [382, 380]]    
+        self.points = [[inv, inv], [61, 63], [140, 146], [220, 229], [300, 63], [300, 146], [300, 229], [540, 63], [461, 146], [382, 229], [61, 304], [140, 304], [220, 304], [inv, inv], [inv, inv], [inv, inv], [381, 304], [460, 304], [538, 304], [61, 539], [140, 461], [220, 380], [300, 539], [300, 461], [300, 380], [540, 539], [461, 461], [382, 380]]    
         self.qtdPoints = len(self.points)
         self.radius = 30
+        self.excluds = [0,13,14,15]
 
         # controlador de quem vai jogar
         self.turnPlayer = False
         self.turnMachine = False
+
+        # quantidade de peças em jogo de cada um
+        self.qtdPlayer = 0
+        self.qtdMachine = 0
         
         # stage Controller
         self.stage1 = False
@@ -51,12 +56,19 @@ class Controller:
 
         return 0
 
+    def getMarkPosition(self, i):
+        if i <= 27 and i not in self.excluds:
+            return self.points[i]
+
+        return [-100, -100]
+
 
 def main():
     control = Controller()
 
     # matriz de interesse
-    print(control.match(290, 390))
+    # print(control.match(290, 390))
+    print(control.getMarkPosition(3))
 
 if __name__ == "__main__":
     main()
