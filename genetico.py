@@ -1,186 +1,140 @@
-import numpy as np
+import gameMoviment as gm 
 import random as rd
-import gameMoviment as gm
-'''
-The representation space value is : 0,1,2 (0 - not ocupped, 1 - play1, 2 - play2 )
-Chromosome, in this problem, is state of game (or a possible solution).
-
-'''
-f = open('PrintTesteArq.txt', 'w')
+import methodsList as ml
 
 
-def convertToGame(l):
-    printTeste(l)
-    b = np.reshape(l, (8, 3))
-    return b
 
-
-def printTeste(*args):
-    print('-->  ' + str(args), file=f)
-
+def printTeste(conteudo, path = 'PrintTesteArq.txt', modoescrita = 'w'):
+    f = open(path, modoescrita)
+    print('-->  ' + conteudo,file=f)
 
 class Genetico:
-    def __init__(self, estado_atual,stage=1):
-        self.estado_atual = estado_atual
+    def __init__(self, estado_atual, stage=2, outputResult = 'PrintTesteArq.txt'):
         self.num_solutions = 10
-        self.num_places_in_board = 24
-        self.pop_size = (self.num_solutions, self.num_places_in_board)
-        self.factorMutagenese = 9
-        self.pin_IA = 2
+        self.tamCromo = 24
         self.old_pop = []
         self.new_pop = []
+        self.estado_atual = estado_atual # deve ser uma lista
+        self.fitness_pop = None
+        self.memoryOfBests = {}
+        self.factorMutagenese = 9
         self.result = None
-        self.first_generation = True
-        self.stage = stage
-
-    def initial_population(self):
-        # distribuição uniforme inicial
-        self.old_pop = np.random.randint(low=0.0, high=3.0, size=(
-            self.num_solutions - 1, self.num_places_in_board))
-        printTeste(self.old_pop)
-        self.old_pop = np.append(self.old_pop, self.estado_atual, axis=0)
-        printTeste(self.old_pop)
+        self.output = outputResult
+        self.modoescrita = 'a'
 
     def calcFit(self, cromossomo):
-        # para fase nao voo
-        # linhas ou qudrante com 2 peças implica em mais pontos
-        # se trancar jogador melhor forma
-        cromossomo = convertToGame(cromossomo)
-        estado_atual_game = convertToGame(self.estado_atual)
-        fit = 0
+        cromo_game = ml.convertListinGameBoard(cromossomo) #convertToGame(cromossomo)
+        estado_atual_game = ml.convertListinGameBoard(self.estado_atual) #convertToGame(self.estado_atual)
+        potencial = 0
         for i in range(8):
             if i % 2 != 0:
-                if cromossomo[i][0] == cromossomo[i][1] or cromossomo[i][0] == cromossomo[i][2] or cromossomo[i][1] == cromossomo[i][2]:
-                    fit += 1
+                if cromo_game[i][0] == cromo_game[i][1] or cromo_game[i][0] == cromo_game[i][2] or cromo_game[i][1] == cromo_game[i][2]:
+                    potencial += 1
             if i % 2 == 0:
                 if i+2 != 8:
                     for j in range(3):
-                        if cromossomo[i][j] == cromossomo[i+1][j] or cromossomo[i][j] == cromossomo[i+2][j] or cromossomo[i+1][j] == cromossomo[i+2][j]:
-                            fit += 1
+                        if cromo_game[i][j] == cromo_game[i+1][j] or cromo_game[i][j] == cromo_game[i+2][j] or cromo_game[i+1][j] == cromo_game[i+2][j]:
+                            potencial += 1
                 else:
                     for j in range(3):
-                        if cromossomo[i][j] == cromossomo[i+1][j] or cromossomo[i][j] == cromossomo[0][j] or cromossomo[i+1][j] == cromossomo[0][j]:
-                            fit += 1
-        value_discrepance = len(np.where(estado_atual_game != cromossomo)[0])
-        printTeste('discrepance : ', value_discrepance, ' fit value: ', fit, 'result fit = ',
-                   fit / value_discrepance if value_discrepance == 2 else -9999999999999999999)
-
-        # return fit / value_discrepance if value_discrepance != 0 else -9999999999999999999
-        return fit / value_discrepance if value_discrepance == 2 else -9999999999999999999
-
+                        if cromo_game[i][j] == cromo_game[i+1][j] or cromo_game[i][j] == cromo_game[0][j] or cromo_game[i+1][j] == cromo_game[0][j]:
+                            potencial += 1
+        value_discrepance = self.calcDiscrepance(estado_atual_game, cromo_game)
+        fit = (5*value_discrepance + 2*potencial)/(5+2)
+        printTeste(f'discrepance :  {value_discrepance},  potencial value: {potencial},  fit:  {fit}', path=self.output,modoescrita = self.modoescrita )
+        return fit
+    
+    def calcDiscrepance(self, cromo1, cromo2):
+        # estabelece um valor para discrepancia
+        tab_value = [2,1,0,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27]
+        # ind = len(np.where(cromo1!= cromo2)[0])
+        flag,indices = ml.compareLists(cromo1, cromo2)
+        ind = 0 if flag else len(indices)
+        value = tab_value[ind]  
+        return 28 - value
+    
     def fitness(self, Pop):
-        self.fitness_pop = np.zeros(self.num_solutions)
-        printTeste('pop : ', len(Pop))
+        self.fitness_pop = []
         for index, individuo in enumerate(Pop):
-            printTeste('index >;', index)
-            self.fitness_pop[index] = self.calcFit(individuo)
-        # return array of each solution's fitness value
+            printTeste(f'Cromossomo Selecionado:  {index}', path=self.output,modoescrita = self.modoescrita )
+            self.fitness_pop.append(self.calcFit(individuo))
 
     def parents(self):
-        # return peer of sulutions for crossover
-        if not self.first_generation:
-            a = np.amax(self.fitness_pop)
-            #print('maior fit : ',a)
-            cp = self.fitness_pop.copy()
-            cp_ind = np.where(cp == a)
-            # print(cp_ind)
-            cp = np.delete(cp, cp_ind[0][0])
-            # print(cp)
-            b = np.amax(cp)
-            #print('segunda maior fit : ', b)
-            a_ind = np.where(self.fitness_pop == a)
-            a_ind = a_ind[0][0] if type(a_ind) != int else a_ind
-            # print(a_ind)
-            b_ind = np.where(self.fitness_pop == b)
-            b_ind = b_ind[0][0] if type(b_ind) != int else b_ind
-            # print(b_ind)
-        else:
-            a_ind, b_ind = 0, 1
-
-        return self.old_pop[a_ind], self.old_pop[b_ind]
-
-    def survive(self):
-        '''
-            melhor resultado é o de maior fit
-        '''
-        a = np.amax(self.fitness_pop)
-        printTeste('matriz fitness ', len(self.fitness_pop))
-        a_ind = np.where(self.fitness_pop == a)
-        a_ind = a_ind[0][0] if type(a_ind) != int else a_ind
-        printTeste('new_pop ',  len(self.new_pop))
-        self.best = self.new_pop[a_ind]
-        printTeste('best = ', self.best, ' fit = ', a)
-        # return the best solution (the best fitness)
-
+        # pais = rd.choices(self.old_pop,weights=self.fitness_pop,k=2)
+        pais = rd.choices(self.old_pop,k=2)
+        return pais[0].copy(), pais[1].copy() 
+            
     def crossover(self):
-        # return new children(or offspring )
-        f1, f2 = self.parents()
-        f1_ind = rd.randint(0, self.num_places_in_board - 1)
-        f2_ind = rd.randint(0, self.num_places_in_board - 1)
-        f1[f1_ind], f2[f2_ind] = f2[f2_ind], f1[f1_ind]
-        self.new_pop.append(list(f1))  # escolha de f1 foi aleatoria
+        p1, p2 = self.parents()
+        i1 = rd.randint(0, 23)
+        i2 = rd.randint(0, 23)
+        p1[i1], p2[i2] = p2[i2] , p1[i1]
+        self.new_pop.append(p1)
         if len(self.new_pop) < self.num_solutions:
-            self.new_pop.append(list(f2))
+            self.new_pop.append(p2)
+        return # 2 listas
 
     def mutation(self):
-        children = rd.randint(0, 9)
-        gene_for_mutation = rd.randint(0, 23)
-        # aleatory change at defined gene (define new phenotype)
-        # if rd.randint(0, 100) % self.factorMutagenese == 0:
-        if rd.randint(1, 100) <= 3:
-            self.new_pop[children][gene_for_mutation] = self.pin_IA
-
-    # condições de movimento
-    def compare(self, cromossomo):
-        cromo_like_game = convertToGame(cromossomo)
-        estado_atual_game = convertToGame(self.estado_atual)
-        indices = np.where(estado_atual_game != cromo_like_game)
-        printTeste('indices fora : ', indices, len(indices[0]))
-        if len(indices[0]) == 2:  # verifica se ha apenas duas tuplas alterada
-            # verificar se o indices correspondem a um moviment
-            print('indices: ', indices)
-            return gm.isMoveValid(estado_atual_game, cromo_like_game, indices)
-        return False
-
-    def solutionIsReady(self):
-        for cromo in self.new_pop:
-            if self.compare(cromo):
-                self.result = cromo
-                return True
-        return False
-
-    def rePreparing(self):
-        self.old_pop = self.new_pop
-        self.new_pop = []
-        self.new_pop.append(self.best)
-        self.first_generation = False
-
-    def newGeneration(self):
-        self.initial_population()
+        a = rd.randint(0,100)
+        ind = rd.randint(0,9)
+        gene = rd.randint(0,23)
+        value = rd.randint(0,2)
+        if a % self.factorMutagenese == 0 :
+            self.new_pop[ind][gene] = value
+        return
+    
+    def survive(self):
+        # salva o melhor para a proxima geração
+        self.best = None
+        for i in range(1,self.num_solutions + 1):
+            _, ind = ml.rankList(self.fitness_pop, i)
+            self.best = self.new_pop[ind]
+            if str(self.best) not in self.memoryOfBests.keys():
+                # self.memoryOfBests[str(self.best)] = self.best
+                break
+        return
+    
+    def inicialPopulation(self, old_pop):
+        #lista randomica de valores inteiros de 0 a 2
+        while len(old_pop) < self.num_solutions - 1 :
+            old_pop.append( ml.crateListRandomic(self.tamCromo,0,2) )
+        old_pop.append(self.estado_atual.copy())
+        
+    def initAlg(self):
+        geracao = 0
+        self.inicialPopulation(self.old_pop)
         self.fitness(self.old_pop)
-        self.new_pop.append(self.old_pop[9])
-        ind_geracao = 0
-        print("Buscando solução ...")
         while True:
-            # Teste:
-            ind_geracao += 1
-            #print('geracao %i' % (ind_geracao))
-            # fimTeste
-            #print('Geracao anterior : ',self.old_pop)
-            # for _i in range(self.num_solutions-1):
+            geracao+=1
             while len(self.new_pop) < self.num_solutions:
-                # get the best result fitness
                 self.crossover()
             self.mutation()
             self.fitness(self.new_pop)
             if self.solutionIsReady():
                 break
-            self.new_pop = np.asarray(self.new_pop)
             self.survive()
-            #print('Geracao posterior : ', self.new_pop)
             self.rePreparing()
-            # if ind_geracao >= 10 :
-            #    break
-        print('Solucao encontrado na geracao ', ind_geracao)
-        return self.result
+        print(f"Resultado encontrado na geracao {geracao} !")
+        return self.result , geracao
+
+    def solutionIsReady(self):
+        for cromo in self.new_pop:
+            cromo_game = ml.convertListinGameBoard(cromo)
+            estado_atual_game = ml.convertListinGameBoard(self.estado_atual)
+            flag, ind_x, ind_y = ml.compareMatriz(cromo_game, estado_atual_game)
+            printTeste(f' self.estado atual = {estado_atual_game} , cromo = {cromo_game}', path=self.output,modoescrita = self.modoescrita )
+            print(f'flag = {flag}, ind_x = {ind_x}, ind_y = {ind_y}')
+            if flag:
+                continue
+            if len(ind_x)==2 and len(ind_y)==2 and gm.isMoveValid(estado_atual_game,cromo_game,(ind_x,ind_y)):
+                self.result = cromo
+                return True
+        return False
+        
+    def rePreparing(self):
+        self.old_pop = self.new_pop
+        self.new_pop = []
+        self.new_pop.append(self.best)
+        self.new_pop.append(self.estado_atual.copy())
+        self.best = []
 

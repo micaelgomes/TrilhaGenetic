@@ -35,7 +35,7 @@ class Genetic:
     def setPositionMachine2stage(self):
         # Buscando nova jogada a partir do estado atual
         g = Genetico(self.chromosome, stage=2)
-        solution = g.newGeneration()
+        solution = g.initAlg()
         return solution
 
     def setPositionMachine3stage(self):
