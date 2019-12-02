@@ -27,19 +27,20 @@ class Genetic:
             self.chromosome[position] = 0
 
     def setPositionMachine1stage(self):
-        for i in range(self.sizeChromosome):
-            if self.chromosome[i] == 0:
-                self.chromosome[i] = 2
-                break
+        g = Genetico(self.chromosome, stage=1)
+        solution, _geracao = g.initAlg()
+        self.chromosome = solution
 
     def setPositionMachine2stage(self):
         # Buscando nova jogada a partir do estado atual
         g = Genetico(self.chromosome, stage=2)
-        solution = g.initAlg()
-        return solution
+        solution, _geracao = g.initAlg()
+        self.chromosome = solution
 
     def setPositionMachine3stage(self):
-        pass
+        g = Genetico(self.chromosome, stage=3)
+        solution, _geracao = g.initAlg()
+        self.chromosome = solution
 
     def getQtdPiecesPlayer(self):
         qtd = 0

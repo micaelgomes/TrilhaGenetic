@@ -21,6 +21,7 @@ class Genetico:
         self.result = None
         self.output = outputResult
         self.modoescrita = 'a'
+        self.stage = stage
 
     def calcFit(self, cromossomo):
         cromo_game = ml.convertListinGameBoard(cromossomo) #convertToGame(cromossomo)
@@ -47,7 +48,6 @@ class Genetico:
     def calcDiscrepance(self, cromo1, cromo2):
         # estabelece um valor para discrepancia
         tab_value = [2,1,0,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27]
-        # ind = len(np.where(cromo1!= cromo2)[0])
         flag,indices = ml.compareLists(cromo1, cromo2)
         ind = 0 if flag else len(indices)
         value = tab_value[ind]  
@@ -72,7 +72,7 @@ class Genetico:
         self.new_pop.append(p1)
         if len(self.new_pop) < self.num_solutions:
             self.new_pop.append(p2)
-        return # 2 listas
+        return 
 
     def mutation(self):
         a = rd.randint(0,100)
@@ -121,12 +121,15 @@ class Genetico:
         for cromo in self.new_pop:
             cromo_game = ml.convertListinGameBoard(cromo)
             estado_atual_game = ml.convertListinGameBoard(self.estado_atual)
-            flag, ind_x, ind_y = ml.compareMatriz(cromo_game, estado_atual_game)
+            equal, ind_x, ind_y = ml.compareMatriz(cromo_game, estado_atual_game)
             printTeste(f' self.estado atual = {estado_atual_game} , cromo = {cromo_game}', path=self.output,modoescrita = self.modoescrita )
-            print(f'flag = {flag}, ind_x = {ind_x}, ind_y = {ind_y}')
-            if flag:
+            # print(f'equal = {equal}, ind_x = {ind_x}, ind_y = {ind_y}')
+            if equal:
                 continue
-            if len(ind_x)==2 and len(ind_y)==2 and gm.isMoveValid(estado_atual_game,cromo_game,(ind_x,ind_y)):
+            if self.stage in [2,3] and len(ind_x)==2 and len(ind_y)==2 and gm.isMoveValidStage2(estado_atual_game,cromo_game,(ind_x,ind_y)):
+                self.result = cromo
+                return True
+            if self.stage == 1 and len(ind_x)==1 and len(ind_y) == 1 and gm.isMoveValidStage1(estado_atual_game, cromo_game, (ind_x,ind_y)):
                 self.result = cromo
                 return True
         return False

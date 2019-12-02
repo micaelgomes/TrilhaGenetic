@@ -35,7 +35,8 @@ else:
     
 # objetos do jogo: marcador, peça situação e oposiçãos
 mark = {'img': pygame.image.load('assets/mark.png'), 'x': -30, 'y': -30}
-mark_big = {'img': pygame.image.load('assets/mark_big.png'), 'x': -60, 'y': -60}
+# mark_big = {'img': pygame.image.load('assets/mark_big.png'), 'x': -60, 'y': -60}
+mark_big = {'img': pygame.image.load('assets/mark.png'), 'x': -60, 'y': -60}
 red  = {'img': pygame.image.load('assets/red.png'), 'x': -60, 'y': -60}
 dark = {'img': pygame.image.load('assets/dark.png'), 'x': -60, 'y': -60}
 
@@ -145,6 +146,7 @@ while run:
 
     # função que renderiza as peças do jogo
     render(27, gene.getChromosome())
+    # render(24, gene.getChromosome())
     
     # função que renderiza o marcador
     renderMark()

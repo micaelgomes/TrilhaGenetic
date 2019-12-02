@@ -43,7 +43,7 @@ def changeQd(estado_atual, cromossomo, linha, qd, move_qd):
 
 '''
 
-def isMoveValid(estado_atual, cromossomo, tupla):
+def isMoveValidStage2(estado_atual, cromossomo, tupla):
     #linhas e qds são ambos de len = 2
     linhas = tupla[0]
     qds = tupla[1]
@@ -55,5 +55,19 @@ def isMoveValid(estado_atual, cromossomo, tupla):
         if estado_atual[pos[0]][pos[1]] == 2 and cromossomo[pos[0]][pos[1]] == 0:
             print('ok')
             if estado_atual[other_pos[0]][other_pos[1]] == 0 and cromossomo[other_pos[0]][other_pos[1]]  == 2 :
+                print('MOVE IS VALID')
                 return True
     return False
+
+def isMoveValidStage1(estado_atual,cromossomo, tupla):
+    linha = tupla[0]
+    qd = tupla[1]
+    #há apenas uma posicao para ser avaliada
+    posicao = (linha[0],qd[0])
+    if estado_atual[posicao[0]][posicao[1]] == 0 and cromossomo[posicao[0]][posicao[1]] == 2:
+        print('Move is Valid')
+        return True
+    return False
+
+def isMoveValidStage3(estado_atual, cromossomo, tupla):
+    pass
