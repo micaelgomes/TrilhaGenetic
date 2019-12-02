@@ -29,16 +29,19 @@ class Genetico:
         potencial = 0
         for i in range(8):
             if i % 2 != 0:
-                if cromo_game[i][0] == cromo_game[i][1] or cromo_game[i][0] == cromo_game[i][2] or cromo_game[i][1] == cromo_game[i][2]:
+                jogada = [cromo_game[i][0], cromo_game[i][1], cromo_game[i],[2] ]
+                if  (2 in jogada) and ( cromo_game[i][0] == cromo_game[i][1] or cromo_game[i][0] == cromo_game[i][2] or cromo_game[i][1] == cromo_game[i][2] ):
                     potencial += 1
             if i % 2 == 0:
                 if i+2 != 8:
                     for j in range(3):
-                        if cromo_game[i][j] == cromo_game[i+1][j] or cromo_game[i][j] == cromo_game[i+2][j] or cromo_game[i+1][j] == cromo_game[i+2][j]:
+                        jogada = [cromo_game[i][j], cromo_game[i+1][j], cromo_game[i+2][j] ]
+                        if (2 in jogada) and (cromo_game[i][j] == cromo_game[i+1][j] or cromo_game[i][j] == cromo_game[i+2][j] or cromo_game[i+1][j] == cromo_game[i+2][j] ):
                             potencial += 1
                 else:
                     for j in range(3):
-                        if cromo_game[i][j] == cromo_game[i+1][j] or cromo_game[i][j] == cromo_game[0][j] or cromo_game[i+1][j] == cromo_game[0][j]:
+                        jogada = [cromo_game[i][j], cromo_game[i+1][j], cromo_game[0][j] ]
+                        if (2 in jogada) and (cromo_game[i][j] == cromo_game[i+1][j] or cromo_game[i][j] == cromo_game[0][j] or cromo_game[i+1][j] == cromo_game[0][j] ):
                             potencial += 1
         value_discrepance = self.calcDiscrepance(estado_atual_game, cromo_game)
         fit = (5*value_discrepance + 2*potencial)/(5+2)
