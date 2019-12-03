@@ -35,8 +35,6 @@ else:
     
 # objetos do jogo: marcador, peça situação e oposiçãos
 mark = {'img': pygame.image.load('assets/mark.png'), 'x': -30, 'y': -30}
-# mark_big = {'img': pygame.image.load('assets/mark_big.png'), 'x': -60, 'y': -60}
-mark_big = {'img': pygame.image.load('assets/mark.png'), 'x': -60, 'y': -60}
 red  = {'img': pygame.image.load('assets/red.png'), 'x': -60, 'y': -60}
 dark = {'img': pygame.image.load('assets/dark.png'), 'x': -60, 'y': -60}
 
@@ -158,6 +156,5 @@ while run:
     if gene.isTrailMachine(): print("Trilha Machine!!")
 
     screen.blit(mark['img'], (mark['x'], mark['y']))
-    screen.blit(mark_big['img'], (mark_big['x'], mark_big['y']))
     screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
     pygame.display.flip()
