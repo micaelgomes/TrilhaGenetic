@@ -39,10 +39,13 @@ red  = {'img': pygame.image.load('assets/red.png'), 'x': -60, 'y': -60}
 dark = {'img': pygame.image.load('assets/dark.png'), 'x': -60, 'y': -60}
 
 # estilo do jogo
-fontSize = 40
+fontSize = 32
 myfont = pygame.font.Font('assets/lobster.ttf', fontSize)
 stringPlayer = myfont.render('Sua Vez!', False, (0, 0, 0))
 stringMachine = myfont.render('Aguarde...', False, (0, 0, 0))
+string1stage = myfont.render('1º Estágio', False, (0, 0, 0))
+string2stage = myfont.render('2º Estágio', False, (0, 0, 0))
+string3stage = myfont.render('3º Estágio', False, (0, 0, 0))
 
 # API controller - (GAME)
 table = Controller()
@@ -52,12 +55,15 @@ gene = Genetic()
 
 # número pra desenhar fora da tela
 numOutScreen = -100
+ 
+# Controle de click inválido
+nullMove = -1
 
 # render mark
 def renderMark():
     position = table.getMark(mouse_x, mouse_y)
-    beFree = gene.getChromosome()[position-1] == 0
-    playerHere = gene.getChromosome()[position-1] == 1
+    beFree = gene.getChromosome()[position] == 0
+    playerHere = gene.getChromosome()[position] == 1
 
     if table.stage1 and table.match(mouse_x, mouse_y) and beFree:
         mark['x'] = table.getX(mouse_x)
@@ -80,11 +86,11 @@ def render(qtd_pieces, pieces):
 
     for i in range(0, qtd_pieces):
         if pieces[i] == 1:
-            position = table.getXY(i+1)
+            position = table.getXY(i)
             screen.blit(red['img'], (position[0]-diff, position[1]-diff))
         
         elif pieces[i] == 2:
-            position = table.getXY(i+1)
+            position = table.getXY(i)
             screen.blit(dark['img'], (position[0]-diff, position[1]-diff))
 
 # Define em qual estágio o jogo se encontra
@@ -110,18 +116,18 @@ def setState():
 def actionGame():
     if table.stage1:
         position = table.getMark(mouse_x, mouse_y)
-        beFree = gene.getChromosome()[position-1] == 0
+        beFree = gene.getChromosome()[position] == 0
 
         if beFree:
-            gene.setPositionPlayer(position-1)
+            gene.setPositionPlayer(position)
             gene.setPositionMachine1stage()
 
     if table.stage2:
         position = table.getMark(mouse_x, mouse_y)
-        playerHere = gene.getChromosome()[position-1] == 1
+        playerHere = gene.getChromosome()[position] == 1
 
         if playerHere:
-            gene.removePiece(position-1)
+            gene.removePiece(position)
 
 
 # flag de controle do jogo
@@ -138,12 +144,12 @@ while run:
         marker = table.getMark(mouse_x, mouse_y) 
         print(mouse, ' -> ', marker)
         
-        if marker != 0: actionGame()
+        if marker != nullMove: actionGame()
 
     screen.blit(tabuleiro, (0,0))
 
     # função que renderiza as peças do jogo
-    render(27, gene.getChromosome())
+    render(gene.getSizeChromosome(), gene.getChromosome())
     # render(24, gene.getChromosome())
     
     # função que renderiza o marcador
@@ -152,9 +158,14 @@ while run:
     # definir estágio do jogo
     setState()
 
-    if gene.isTrailPlayer(): print("Trilha Player!!")
-    if gene.isTrailMachine(): print("Trilha Machine!!")
+    if table.isTrailPlayer(gene.getChromosome()): print("Trilha Player!!")
+    if table.isTrailMachine(gene.getChromosome()): print("Trilha Machine!!")
 
     screen.blit(mark['img'], (mark['x'], mark['y']))
     screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
+
+    if table.stage1: screen.blit(string1stage,(tabuleiro.get_width()-200, 100))
+    elif table.stage2: screen.blit(string2stage,(tabuleiro.get_width()-200, 100))
+    else: screen.blit(string3stage,(tabuleiro.get_width()-200, 100))
+    
     pygame.display.flip()
