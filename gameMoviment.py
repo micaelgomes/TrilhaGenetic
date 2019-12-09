@@ -15,7 +15,7 @@ table_of_adj = [
 
 def isAdjacent(pos, other_pos):
     aux = table_of_adj[pos[0]][pos[1]]
-    print('aux ', aux, 'comparar : ' ,(other_pos in aux))
+    # print('aux ', aux, 'comparar : ' ,(other_pos in aux))
     return (other_pos in aux)
 
 '''
@@ -50,10 +50,10 @@ def isMoveValidStage2(estado_atual, cromossomo, tupla):
      #primeiro parametro é a posicao no estado atual e  
     pos = (linhas[0], qds[0])
     other_pos = (linhas[1], qds[1])
-    print('pos ',pos, 'otherpos ', other_pos )
+    # print('pos ',pos, 'otherpos ', other_pos )
     if isAdjacent(pos, other_pos):
         if estado_atual[pos[0]][pos[1]] == 2 and cromossomo[pos[0]][pos[1]] == 0:
-            print('ok')
+            # print('ok')
             if estado_atual[other_pos[0]][other_pos[1]] == 0 and cromossomo[other_pos[0]][other_pos[1]]  == 2 :
                 print('MOVE IS VALID')
                 return True
@@ -65,7 +65,7 @@ def isMoveValidStage1(estado_atual,cromossomo, tupla):
     #há apenas uma posicao para ser avaliada
     posicao = (linha[0],qd[0])
     if estado_atual[posicao[0]][posicao[1]] == 0 and cromossomo[posicao[0]][posicao[1]] == 2:
-        print('Move is Valid')
+        # print('Move is Valid')
         return True
     return False
 

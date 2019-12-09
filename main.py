@@ -27,14 +27,20 @@ screen = pygame.display.set_mode(size)
 # imagem do tabuleiro
 # tabuleiro = pygame.image.load('assets/tab.png')
 if len(sys.argv) > 1:
-    pygame.display.set_caption('Trilha - debug mode')
-    tabuleiro = pygame.image.load('assets/tab_mark.png')
+    if sys.argv[1] == "--debug" or sys.argv[1] == "-d":
+        pygame.display.set_caption('Trilha - debug mode')
+        tabuleiro = pygame.image.load('assets/tab_mark.png')
+    else:
+        print('Flag ERROR: try --help to see more')
 else:
     pygame.display.set_caption('Trilha')
     tabuleiro = pygame.image.load('assets/tab.png')
     
 # objetos do jogo: marcador, peça situação e oposiçãos
 mark = {'img': pygame.image.load('assets/mark.png'), 'x': -30, 'y': -30}
+big_mark = {'img': pygame.image.load('assets/big_mark.png'), 'x': -30, 'y': -30}
+close = {'img': pygame.image.load('assets/close.png'), 'x': -40, 'y': -40}
+kill = {'img': pygame.image.load('assets/kill.png'), 'x': -200, 'y': -200}
 red  = {'img': pygame.image.load('assets/red.png'), 'x': -60, 'y': -60}
 dark = {'img': pygame.image.load('assets/dark.png'), 'x': -60, 'y': -60}
 
@@ -43,6 +49,8 @@ fontSize = 32
 myfont = pygame.font.Font('assets/lobster.ttf', fontSize)
 stringPlayer = myfont.render('Sua Vez!', False, (0, 0, 0))
 stringMachine = myfont.render('Aguarde...', False, (0, 0, 0))
+
+# strings de Stages
 string1stage = myfont.render('1º Estágio', False, (0, 0, 0))
 string2stage = myfont.render('2º Estágio', False, (0, 0, 0))
 string3stage = myfont.render('3º Estágio', False, (0, 0, 0))
@@ -54,34 +62,63 @@ table = Controller()
 gene = Genetic()
 
 # número pra desenhar fora da tela
-numOutScreen = -100
+numOutScreen = -200
  
 # Controle de click inválido
 nullMove = -1
 
 # render mark
 def renderMark():
-    position = table.getMark(mouse_x, mouse_y)
-    beFree = gene.getChromosome()[position] == 0
-    playerHere = gene.getChromosome()[position] == 1
 
-    if table.stage1 and table.match(mouse_x, mouse_y) and beFree:
-        mark['x'] = table.getX(mouse_x)
-        mark['y'] = table.getY(mouse_y)
+    if table.playerTurn and not table.executeOrder66:
+        position = table.getMark(mouse_x, mouse_y)
+        beFree = gene.getChromosome()[position] == 0
+        playerHere = gene.getChromosome()[position] == 1
+        neighborFree = False
+        
+        if position != nullMove:
+            neighbor = table.getNeighbor(position)
+            for i in range(len(neighbor)):
+                if gene.getChromosome()[neighbor[i]] == 0:
+                    neighborFree = True
 
-    elif table.stage2 and table.match(mouse_x, mouse_y) and playerHere:
-        mark['x'] = table.getX(mouse_x)
-        mark['y'] = table.getY(mouse_y)
+        if table.stage1_player and table.match(mouse_x, mouse_y) and beFree:
+            mark['x'] = table.getX(mouse_x)
+            mark['y'] = table.getY(mouse_y)
 
-    elif table.stage2 and table.match(mouse_x, mouse_y) and playerHere:
-        pass
+        elif table.stage2_player and table.match(mouse_x, mouse_y) and playerHere and neighborFree:
+            mark['x'] = table.getX(mouse_x)
+            mark['y'] = table.getY(mouse_y)
+
+        elif table.stage2_player and table.match(mouse_x, mouse_y) and playerHere:
+            pass
+
+        else:
+            mark['x'] = numOutScreen
+            mark['y'] = numOutScreen
 
     else:
-        mark['x'] = numOutScreen
-        mark['y'] = numOutScreen
+        position = table.getMark(mouse_x, mouse_y)
+        hasOponent = gene.getChromosome()[position] == 2
+
+        if table.stage1_player and table.match(mouse_x, mouse_y) and hasOponent:
+            close['x'] = table.getX(mouse_x) - 10
+            close['y'] = table.getY(mouse_y) - 10
+
+        elif table.stage2_player and table.match(mouse_x, mouse_y) and hasOponent:
+            close['x'] = table.getX(mouse_x) - 10
+            close['y'] = table.getY(mouse_y) - 10
+
+        else:
+            close['x'] = numOutScreen
+            close['y'] = numOutScreen
+
+def removeMark():
+    close['x'] = numOutScreen
+    close['y'] = numOutScreen
 
 # render peças
-def render(qtd_pieces, pieces):
+def render(qtd_pieces, pieces, clone):
     diff = 35
 
     for i in range(0, qtd_pieces):
@@ -93,41 +130,111 @@ def render(qtd_pieces, pieces):
             position = table.getXY(i)
             screen.blit(dark['img'], (position[0]-diff, position[1]-diff))
 
+        elif clone[i] == 3:
+            position = table.getXY(i)
+            screen.blit(big_mark['img'], (position[0]-diff, position[1]-diff))
+
 # Define em qual estágio o jogo se encontra
 def setState():
     qtdPlayer = gene.getQtdPiecesPlayer()
     qtdMachine = gene.getQtdPiecesMachine()
 
     if qtdPlayer < 9 and qtdMachine < 9:
-        table.stage1 = True
-        table.stage2 = False
-        table.stage3 = False
+        table.stage1_player = True
+        table.stage2_player = False
+        table.stage3_player = False
 
-    elif qtdPlayer <= 3 or qtdMachine <= 3: 
-        table.stage1 = False
-        table.stage2 = False
-        table.stage3 = True
+        table.stage1_machine = True
+        table.stage2_machine = False
+        table.stage3_machine = False
+
+    elif qtdPlayer <= 3: 
+        table.stage1_player = False
+        table.stage2_player = False
+        table.stage3_player = True
+
+        table.stage1_machine = False
+        table.stage2_machine = False
+        table.stage3_machine = True
+
+    elif qtdMachine <= 3:
+        table.stage1_player = False
+        table.stage2_player = False
+        table.stage3_player = True
+
+        table.stage1_machine = False
+        table.stage2_machine = False
+        table.stage3_machine = True
+    
     else :
-        table.stage1 = False
-        table.stage2 = True
-        table.stage3 = False
+        table.stage1_player = False
+        table.stage2_player = True
+        table.stage3_player = False
+
+        table.stage1_player = False
+        table.stage2_player = True
+        table.stage3_player = False
 
 # Ação efetiva do jogo
 def actionGame():
-    if table.stage1:
+    
+    if not table.executeOrder66:
+        # Controle de ação do Player
+        if table.playerTurn:
+            if table.stage1_player:
+                position = table.getMark(mouse_x, mouse_y)
+                beFree = gene.getChromosome()[position] == 0
+
+                if beFree:
+                    gene.setPositionPlayer(position)
+                    removeMark()
+                    table.playerHasMooved = True
+
+
+            if table.stage2_player:
+                position = table.getMark(mouse_x, mouse_y)
+                playerHere = gene.getChromosome()[position] == 1
+                freePositionToGo = gene.getClone()[position] == 3
+                neighborFree = False
+            
+                if position != nullMove:
+                    neighbor = table.getNeighbor(position)
+                    for i in range(len(neighbor)):
+                        if gene.getChromosome()[neighbor[i]] == 0:
+                            neighborFree = True
+
+                if playerHere and neighborFree:
+                    gene.removePiece(position)
+                    neighbor = table.getNeighbor(position)
+
+                    for i in range(len(neighbor)):
+                        if gene.getChromosome()[neighbor[i]] == 0:
+                            gene.setPossibleMovePlayer(neighbor[i])
+
+                if freePositionToGo:
+                    gene.setPositionPlayer(position)
+                    gene.resetClone()
+                    removeMark()
+                    table.playerHasMooved = True
+
+        # Controle de ação da Máquina
+        if not table.playerTurn:
+            if table.stage1_machine:
+                gene.setPositionMachine1stage()
+                table.playerHasMooved = False
+
+            if table.stage2_machine:
+                gene.setPositionMachine2stage()
+                table.playerHasMooved = False
+    
+    else:
         position = table.getMark(mouse_x, mouse_y)
-        beFree = gene.getChromosome()[position] == 0
+        hasOponent = gene.getChromosome()[position] == 2
 
-        if beFree:
-            gene.setPositionPlayer(position)
-            gene.setPositionMachine1stage()
-
-    if table.stage2:
-        position = table.getMark(mouse_x, mouse_y)
-        playerHere = gene.getChromosome()[position] == 1
-
-        if playerHere:
-            gene.removePiece(position)
+        if hasOponent:
+            gene.kill1PieceMachine(position)
+            table.executeOrder66 = False
+            table.playerHasMooved = True
 
 
 # flag de controle do jogo
@@ -139,33 +246,50 @@ while run:
 
     mouse = mouse_x, mouse_y = pygame.mouse.get_pos()
     mouse_click = pygame.mouse.get_pressed()
-    
+
     if mouse_click != (0,0,0) :
         marker = table.getMark(mouse_x, mouse_y) 
-        print(mouse, ' -> ', marker)
+        # print(mouse, ' -> ', marker)
         
         if marker != nullMove: actionGame()
 
-    screen.blit(tabuleiro, (0,0))
 
-    # função que renderiza as peças do jogo
-    render(gene.getSizeChromosome(), gene.getChromosome())
-    # render(24, gene.getChromosome())
+    screen.blit(tabuleiro, (0,0))
     
+    # função que renderiza as peças do jogo 
+    render(gene.getSizeChromosome(), gene.getChromosome(), gene.getClone())
+
     # função que renderiza o marcador
     renderMark()
 
     # definir estágio do jogo
     setState()
 
-    if table.isTrailPlayer(gene.getChromosome()): print("Trilha Player!!")
+    if table.isTrailPlayer(gene.getChromosome()): table.executeOrder66 = True
     if table.isTrailMachine(gene.getChromosome()): print("Trilha Machine!!")
 
     screen.blit(mark['img'], (mark['x'], mark['y']))
-    screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
+    screen.blit(close['img'], (close['x'], close['y']))
+    screen.blit(kill['img'], (kill['x'], kill['y']))
 
-    if table.stage1: screen.blit(string1stage,(tabuleiro.get_width()-200, 100))
-    elif table.stage2: screen.blit(string2stage,(tabuleiro.get_width()-200, 100))
+    if table.playerHasMooved: 
+        table.playerTurn = False
+        table.playerHasMooved = False
+    else:
+        table.playerTurn = True
+
+    if table.playerTurn: screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
+    else: screen.blit(stringMachine,(tabuleiro.get_width()-200, 35))
+
+    if table.stage1_player: screen.blit(string1stage,(tabuleiro.get_width()-200, 100))
+    elif table.stage2_player: screen.blit(string2stage,(tabuleiro.get_width()-200, 100))
     else: screen.blit(string3stage,(tabuleiro.get_width()-200, 100))
+    
+    if table.executeOrder66: 
+        kill['x'] = 600
+        kill['y'] = 350
+    else:
+        kill['x'] = -200
+        kill['y'] = -200
     
     pygame.display.flip()
