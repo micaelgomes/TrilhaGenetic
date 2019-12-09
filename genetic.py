@@ -8,14 +8,19 @@ class Genetic:
     def __init__(self):
         self.sizeChromosome = 24
         # Random
-        # self.chromosome = [1,2,0,0,2,0,1,0,1,2,1,2,1,2,0,0,0,2,1,2,0,1,0,2,0,2,1]
+        # self.chromosome = [1,2,1,0,2,0,1,0,1,2,1,2,1,2,0,0,2,2,1,2,1,1,0,2]
         # start
         self.chromosome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        # begin 2nd stage
-        # self.chromosome = [2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1]
+        self.clone = self.chromosome[:]
 
     def getChromosome(self):
         return self.chromosome
+
+    def getClone(self):
+        return self.clone
+
+    def resetClone(self):
+        self.clone = self.chromosome[:]
 
     def getSizeChromosome(self):
         return self.sizeChromosome
@@ -23,6 +28,14 @@ class Genetic:
     def setPositionPlayer(self, position):
         if position >= 0 and position <= self.sizeChromosome:
             self.chromosome[position] = 1
+
+    def kill1PieceMachine(self, position):
+        if position >= 0 and position <= self.sizeChromosome:
+            self.chromosome[position] = 0
+
+    def setPossibleMovePlayer(self, position):
+        if position >= 0 and position <= self.sizeChromosome:
+            self.clone[position] = 3
 
     def removePiece(self, position):
         if position >= 0 and position <= self.sizeChromosome:

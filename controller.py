@@ -16,15 +16,32 @@ class Controller:
         self.radius = 30
 
         # stage Controller
-        self.stage1 = False
-        self.stage2 = False
-        self.stage3 = False
+        self.stage1_player = False
+        self.stage2_player = False
+        self.stage3_player = False
+        
+        self.stage1_machine = False
+        self.stage2_machine = False
+        self.stage3_machine = False
+
+        # Controlador de Turnos
+        self.playerTurn = True
+        self.playerHasMooved = False
+
+        # controlador de exclusão após trilha
+        self.executeOrder66 = False
 
         # array de trilhas formadas
         self.trailPlayer = np.zeros((self.qtdPoints, self.qtdPoints, self.qtdPoints))
         self.trailMachine = np.zeros((self.qtdPoints, self.qtdPoints, self.qtdPoints))
         self.setTrailPositionsPlayer()
         self.setTrailPositionsMachine()
+
+    def getNeighbor(self, i):
+        if i >= 0 and i <= self.qtdPoints:
+            return self.neighbor[i]
+
+        return -1
 
     def getX(self, x):
         for i in range(self.qtdPoints):
