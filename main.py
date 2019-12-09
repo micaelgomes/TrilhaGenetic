@@ -239,6 +239,10 @@ def actionGame():
 
 # flag de controle do jogo
 run = True
+canMoove = True
+last_frame_move = pygame.time.get_ticks()
+timeToClick = 0.200
+
 while run:
 
     for event in pygame.event.get():
@@ -247,12 +251,23 @@ while run:
     mouse = mouse_x, mouse_y = pygame.mouse.get_pos()
     mouse_click = pygame.mouse.get_pressed()
 
-    if mouse_click != (0,0,0) :
+    if mouse_click != (0,0,0) and canMoove:
         marker = table.getMark(mouse_x, mouse_y) 
-        # print(mouse, ' -> ', marker)
+        print(mouse, ' -> ', marker)
         
+        canMoove = False
+        last_frame_move = pygame.time.get_ticks()
+
         if marker != nullMove: actionGame()
 
+    now_frame = pygame.time.get_ticks()
+
+    delta = (now_frame - last_frame_move) / 1000.0
+
+    #print(delta)
+
+    if delta >= timeToClick and canMoove == False:
+        canMoove = True
 
     screen.blit(tabuleiro, (0,0))
     
