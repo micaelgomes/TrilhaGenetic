@@ -26,7 +26,6 @@ class Controller:
 
         # Controlador de Turnos
         self.playerTurn = True
-        self.playerHasMooved = False
 
         # controlador de exclusão após trilha
         self.executeOrder66 = False
