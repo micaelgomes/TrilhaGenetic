@@ -55,6 +55,13 @@ def rankList(lista, pos_rank):
     ob = order_list[pos_rank-1]
     ind = lista.index(ob)
     return ob, ind
-    
+
+def convertGameBoardInList(game):
+    nova = []
+    for _,linhas in enumerate(game):
+        for _,value in enumerate(linhas):
+            nova.append(value)
+    return nova
+
 if __name__ == "__main__":
     print(convertListinGameBoard([0,1,0, 2,0,1, 0,2,1, 1,2,2, 0,1,0, 2,1,1,2,2,0,1,0,2]))

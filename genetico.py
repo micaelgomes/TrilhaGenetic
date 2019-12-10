@@ -113,14 +113,14 @@ class Genetico:
                 self.crossover()
             self.mutation()
             self.fitness(self.new_pop)
-            if self.solutionIsReady():
+            if self.solutionIsReady(geracao):
                 break
             self.survive()
             self.rePreparing()
         print(f"Resultado encontrado na geracao {geracao} !")
         return self.result , geracao
 
-    def solutionIsReady(self):
+    def solutionIsReady(self,geracao):
         for cromo in self.new_pop:
             cromo_game = ml.convertListinGameBoard(cromo)
             estado_atual_game = ml.convertListinGameBoard(self.estado_atual)
@@ -129,10 +129,13 @@ class Genetico:
             # print(f'equal = {equal}, ind_x = {ind_x}, ind_y = {ind_y}')
             if equal:
                 continue
-            if self.stage in [2,3] and len(ind_x)==2 and len(ind_y)==2 and gm.isMoveValidStage2(estado_atual_game,cromo_game,(ind_x,ind_y)):
+            if self.stage == 1 and len(ind_x)==1 and len(ind_y) == 1 and gm.isMoveValidStage1(estado_atual_game, cromo_game, (ind_x,ind_y), geracao):
                 self.result = cromo
                 return True
-            if self.stage == 1 and len(ind_x)==1 and len(ind_y) == 1 and gm.isMoveValidStage1(estado_atual_game, cromo_game, (ind_x,ind_y)):
+            if self.stage == 2 and len(ind_x)==2 and len(ind_y)==2 and gm.isMoveValidStage2(estado_atual_game,cromo_game,(ind_x,ind_y)):
+                self.result = cromo
+                return True
+            if self.stage == 3 and len(ind_x)==2 and len(ind_y)==2 and gm.isMoveValidStage3(estado_atual_game,cromo_game,(ind_x,ind_y), geracao):
                 self.result = cromo
                 return True
         return False
@@ -143,4 +146,22 @@ class Genetico:
         self.new_pop.append(self.best)
         self.new_pop.append(self.estado_atual.copy())
         self.best = []
+
+    def removePieceAdv(self, estado_atual):
+        listPosAdv, listPosIA = [],[] 
+        estado_atual_game = ml.convertListinGameBoard(estado_atual)
+        for lin, cols in enumerate(estado_atual_game):
+            for col, value in enumerate(cols):
+                if value == 1:
+                    listPosAdv.append((lin,col))
+                elif value == 2:
+                    listPosIA.apppend((lin,col))
+        removePos = gm.hasTupleAdj(listPosAdv)
+        if removePos:
+            removePos = gm.hasTupleAdjInLists(listPosAdv, listPosIA)
+        if removePos: 
+            remonePos = rd.choice(listPosAdv)
+        estado_atual_game[removePos[0]][removePos[1]] = 0
+        return  ml.convertGameBoardInList(estado_atual_game)
+
 

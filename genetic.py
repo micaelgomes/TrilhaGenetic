@@ -9,9 +9,9 @@ class Genetic:
         self.sizeChromosome = 24
         # Random
         # self.chromosome = [1,2,1,0,2,0,1,0,1,2,1,2,1,2,0,0,2,2,1,2,1,1,0,2]
-        self.chromosome = [0,2,0,0,0,0,2,0,1,0,1,0,2,2,0,0,2,2,1,2,0,0,0,0]
+        # self.chromosome = [0,2,0,0,0,0,2,0,1,0,1,0,2,2,0,0,2,2,1,2,0,0,0,0]
         # start
-        # self.chromosome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.chromosome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.clone = self.chromosome[:]
 
     def getChromosome(self):
@@ -39,9 +39,9 @@ class Genetic:
             self.clone[position] = 3
 
     def removePiece(self, position):
-        if position >= 0 and position <= self.sizeChromosome:
-            self.chromosome[position] = 0
-
+        g = Genetico(self.chromosome)
+        self.chromosome = g.removePiece(self.chromosome.copy())
+    
     def setPositionMachine1stage(self):
         g = Genetico(self.chromosome, stage=1)
         solution, _geracao = g.initAlg()
