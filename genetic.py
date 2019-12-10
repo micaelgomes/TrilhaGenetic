@@ -9,9 +9,9 @@ class Genetic:
         self.sizeChromosome = 24
         # Random
         # self.chromosome = [1,2,1,0,2,0,1,0,1,2,1,2,1,2,0,0,2,2,1,2,1,1,0,2]
-        self.chromosome = [0,1,0,0,0,0,1,0,2,0,2,0,1,1,0,0,2,1,2,1,0,0,0,0]
+        # self.chromosome = [0,2,0,0,0,0,2,0,1,0,1,0,2,2,0,0,2,1,2,2,0,0,0,0]
         # start
-        # self.chromosome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.chromosome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.clone = self.chromosome[:]
 
         self.qtdFixedPlayer = 1

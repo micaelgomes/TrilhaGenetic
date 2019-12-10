@@ -36,7 +36,7 @@ def convertListinGameBoard(lista):
     y_axis = 3
     linha, qd = 0,0
     for _i in range(x_axis):
-        nova.append(lista([],[],[]))
+        nova.append([[],[],[]])
     for i in range(9):
         if i != 0 and i % 3 == 0:
             linha += 1
@@ -45,18 +45,19 @@ def convertListinGameBoard(lista):
         qd += 1
     j = 0
     for i in range(9,12):
-        nova[7][j]= linha[i]
+        # print(type(lista[i]))
+        nova[7][j] = lista[i]
         j+=1
     j = 2
     for i in range(12,15):
-        nova[3][j] = linha[i]
+        nova[3][j] = lista[i]
         j-=1
     linha, qd = 6, 0
     for i in range(15,24):
         if i != 15 and i % 3 == 0:
             linha -=1
             qd = 0
-        nova[linha][qd] = linha[i]
+        nova[linha][qd] = lista[i]
         qd+=1
     return nova
     # x_axis = 8

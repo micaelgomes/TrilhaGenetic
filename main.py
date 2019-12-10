@@ -56,6 +56,7 @@ fontSize = 32
 myfont = pygame.font.Font('assets/lobster.ttf', fontSize)
 stringPlayer = myfont.render('Sua Vez!', False, (0, 0, 0))
 stringMachine = myfont.render('Aguarde...', False, (0, 0, 0))
+stringVamos = myfont.render('Vamos Jogar!', False, (0, 0, 0))
 
 # strings de Stages
 string1stage = myfont.render('1º Estágio', False, (0, 0, 0))
@@ -154,10 +155,10 @@ def setState():
     qtdMachine = gene.getQtdPiecesMachine()
 
     # variável de teste de fase 
-    table.passed1Stage = True
-    table.machinePassed1Stage = True
-    gene.qtdFixedPlayer = 9
-    gene.qtdFixedMachine = 9
+    # table.passed1Stage = True
+    # table.machinePassed1Stage = True
+    # gene.qtdFixedPlayer = 9
+    # gene.qtdFixedMachine = 9
 
     if gene.qtdFixedPlayer <= 9 and not table.passed1Stage:
         table.stage1_player = True
@@ -194,8 +195,8 @@ def setState():
         table.stage2_machine = True
         table.stage3_machine = False
 
-    print('player-', table.stage1_player,table.stage2_player,table.stage3_player)
-    print('machine-', table.stage1_machine,table.stage2_machine,table.stage3_machine)
+    # print('player-', table.stage1_player,table.stage2_player,table.stage3_player)
+    # print('machine-', table.stage1_machine,table.stage2_machine,table.stage3_machine)
 
 # Ação efetiva do jogo (player)
 def actionGame():
@@ -344,8 +345,9 @@ while run:
     screen.blit(close['img'], (close['x'], close['y']))
     screen.blit(kill['img'], (kill['x'], kill['y']))
 
-    if table.playerTurn and not finish: screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
-    elif not table.playerTurn and not finish: screen.blit(stringMachine,(tabuleiro.get_width()-200, 35))
+    screen.blit(stringVamos,(tabuleiro.get_width()-200, 35))
+    # if table.playerTurn and not finish: screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
+    # elif not table.playerTurn and not finish: screen.blit(stringMachine,(tabuleiro.get_width()-200, 35))
 
     if table.stage1_player and not finish: screen.blit(string1stage,(tabuleiro.get_width()-200, 100))
     elif table.stage2_player and not finish: screen.blit(string2stage,(tabuleiro.get_width()-200, 100))
