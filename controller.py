@@ -32,6 +32,7 @@ class Controller:
 
         # controlador de exclusão após trilha
         self.executeOrder66 = False
+        self.executePiecePlayer = False
 
         # array de trilhas formadas
         self.trailPlayer = np.zeros((self.qtdPoints, self.qtdPoints, self.qtdPoints))

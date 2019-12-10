@@ -47,6 +47,7 @@ mark = {'img': pygame.image.load('assets/mark.png'), 'x': -30, 'y': -30}
 big_mark = {'img': pygame.image.load('assets/big_mark.png'), 'x': -30, 'y': -30}
 close = {'img': pygame.image.load('assets/close.png'), 'x': -40, 'y': -40}
 kill = {'img': pygame.image.load('assets/kill.png'), 'x': -200, 'y': -200}
+rip = {'img': pygame.image.load('assets/rip.png'), 'x': -200, 'y': -200}
 red  = {'img': pygame.image.load('assets/red.png'), 'x': -60, 'y': -60}
 dark = {'img': pygame.image.load('assets/dark.png'), 'x': -60, 'y': -60}
 
@@ -151,47 +152,49 @@ def render(qtd_pieces, pieces, clone):
 def setState():
     qtdPlayer = gene.getQtdPiecesPlayer()
     qtdMachine = gene.getQtdPiecesMachine()
+    machinePassed1Stage = False
 
     # variável de teste de fase 
     # table.passed1Stage = True
 
-    if qtdPlayer < 9 and qtdMachine < 9 and not table.passed1Stage:
+    if gene.qtdFixedPlayer <= 9 and not table.passed1Stage:
         table.stage1_player = True
         table.stage2_player = False
         table.stage3_player = False
 
+    elif gene.qtdFixedPlayer > 9:
+        table.passed1Stage = True
+
+    if gene.qtdFixedMachine <= 9 and not table.passed1Stage:
         table.stage1_machine = True
         table.stage2_machine = False
         table.stage3_machine = False
+    elif gene.qtdFixedMachine > 9:
+        machinePassed1Stage = True
 
-    elif qtdPlayer <= 3: 
+    if qtdPlayer <= 3 and table.passed1Stage: 
         table.stage1_player = False
         table.stage2_player = False
         table.stage3_player = True
 
-        table.stage1_machine = False
-        table.stage2_machine = False
-        table.stage3_machine = True
-
-    elif qtdMachine <= 3:
-        table.stage1_player = False
-        table.stage2_player = False
-        table.stage3_player = True
-
+    if qtdMachine <= 3 and table.passed1Stage:
         table.stage1_machine = False
         table.stage2_machine = False
         table.stage3_machine = True
     
-    else :
+    if not (qtdPlayer <= 3) and table.passed1Stage: 
         table.stage1_player = False
         table.stage2_player = True
         table.stage3_player = False
 
-        table.stage1_player = False
-        table.stage2_player = True
-        table.stage3_player = False
+    if not (qtdMachine <= 3) and machinePassed1Stage:
+        table.stage1_machine = False
+        table.stage2_machine = True
+        table.stage3_machine = False
 
-        table.passed1Stage = True
+
+    print('player-',table.stage1_player, table.stage2_player, table.stage3_player)
+    print('machine-',table.stage1_machine, table.stage2_machine, table.stage3_machine)
 
 # Ação efetiva do jogo (player)
 def actionGame():
@@ -205,6 +208,8 @@ def actionGame():
 
                 if beFree:
                     gene.setPositionPlayer(position)
+                    if gene.qtdFixedPlayer <= 9:
+                        gene.qtdFixedPlayer += 1
                     removeMark()
                     table.playerTurn = False
 
@@ -221,7 +226,7 @@ def actionGame():
                             neighborFree = True
 
                 if playerHere and neighborFree:
-                    gene.removePiece(position)
+                    gene.removePiecePlayer(position)
                     neighbor = table.getNeighbor(position)
 
                     for i in range(len(neighbor)):
@@ -240,7 +245,7 @@ def actionGame():
                 freePositionToGo = gene.getClone()[position] == 3
 
                 if playerHere :
-                    gene.removePiece(position)
+                    gene.removePiecePlayer(position)
                     chromosome = gene.getChromosome()
 
                     for i in range(gene.getSizeChromosome()):
@@ -269,6 +274,8 @@ def machineAction():
     if not table.playerTurn: 
         if table.stage1_machine:
             gene.setPositionMachine1stage()
+            if gene.qtdFixedMachine <= 9:
+                gene.qtdFixedMachine += 1
             table.playerTurn = True
 
         if table.stage2_machine:
@@ -276,7 +283,7 @@ def machineAction():
             table.playerTurn = True
 
         if table.stage3_machine:
-            # função de 3º estágio
+            gene.setPositionMachine3stage()
             table.playerTurn = True
 
 # flags de controles do jogo
@@ -330,10 +337,12 @@ while run:
     # definir estágio do jogo
     setState()
 
-    if table.isTrailPlayer(gene.getChromosome()): table.executeOrder66 = True
+    if table.isTrailPlayer(gene.getChromosome()): 
+        print("Trilha Player!!")
+        table.executeOrder66 = True
     if table.isTrailMachine(gene.getChromosome()): 
         print("Trilha Machine!!")
-        gene.removePiece()
+        gene.removePieceMachine()
 
     # checagem de trilha dupla
     table.disolveTrail(gene.getChromosome())
