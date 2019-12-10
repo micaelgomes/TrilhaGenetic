@@ -23,6 +23,9 @@ class Genetic:
     def resetClone(self):
         self.clone = self.chromosome[:]
 
+    def resetChromosome(self):
+        self.chromosome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
     def getSizeChromosome(self):
         return self.sizeChromosome
 

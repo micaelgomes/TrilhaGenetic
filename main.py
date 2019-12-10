@@ -153,7 +153,7 @@ def setState():
     qtdMachine = gene.getQtdPiecesMachine()
 
     # variável de teste de fase 
-    table.passed1Stage = True
+    # table.passed1Stage = True
 
     if qtdPlayer < 9 and qtdMachine < 9 and not table.passed1Stage:
         table.stage1_player = True
@@ -285,7 +285,7 @@ canMoove = True
 last_frame_move = pygame.time.get_ticks()
 timeToClick = 0.500
 pygame.mixer.music.play()
-
+finish = False
 
 while run:
 
@@ -311,9 +311,12 @@ while run:
     if delta >= timeToClick and canMoove == False:
         canMoove = True
 
-    if gene.getQtdPiecesPlayer() == 0:
+    if gene.getQtdPiecesPlayer() < 3 and table.passed1Stage:
+        gene.resetChromosome()
         screen.blit(loser, (0,0))
-    elif gene.getQtdPiecesMachine() == 0:
+        
+    elif gene.getQtdPiecesMachine() < 3 and table.passed1Stage:
+        gene.resetChromosome()
         screen.blit(win, (0,0))
     else:
         screen.blit(tabuleiro, (0,0))
@@ -337,12 +340,12 @@ while run:
     screen.blit(close['img'], (close['x'], close['y']))
     screen.blit(kill['img'], (kill['x'], kill['y']))
 
-    if table.playerTurn: screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
-    else: screen.blit(stringMachine,(tabuleiro.get_width()-200, 35))
+    if table.playerTurn and not finish: screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
+    elif not table.playerTurn and not finish: screen.blit(stringMachine,(tabuleiro.get_width()-200, 35))
 
-    if table.stage1_player: screen.blit(string1stage,(tabuleiro.get_width()-200, 100))
-    elif table.stage2_player: screen.blit(string2stage,(tabuleiro.get_width()-200, 100))
-    elif table.stage3_player: screen.blit(string3stage,(tabuleiro.get_width()-200, 100))
+    if table.stage1_player and not finish: screen.blit(string1stage,(tabuleiro.get_width()-200, 100))
+    elif table.stage2_player and not finish: screen.blit(string2stage,(tabuleiro.get_width()-200, 100))
+    elif table.stage3_player and not finish: screen.blit(string3stage,(tabuleiro.get_width()-200, 100))
     
     if table.executeOrder66: 
         kill['x'] = 600
