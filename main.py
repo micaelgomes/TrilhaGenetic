@@ -152,10 +152,12 @@ def render(qtd_pieces, pieces, clone):
 def setState():
     qtdPlayer = gene.getQtdPiecesPlayer()
     qtdMachine = gene.getQtdPiecesMachine()
-    machinePassed1Stage = False
 
     # variável de teste de fase 
-    # table.passed1Stage = True
+    table.passed1Stage = True
+    table.machinePassed1Stage = True
+    gene.qtdFixedPlayer = 9
+    gene.qtdFixedMachine = 9
 
     if gene.qtdFixedPlayer <= 9 and not table.passed1Stage:
         table.stage1_player = True
@@ -170,14 +172,14 @@ def setState():
         table.stage2_machine = False
         table.stage3_machine = False
     elif gene.qtdFixedMachine > 9:
-        machinePassed1Stage = True
+        table.machinePassed1Stage = True
 
     if qtdPlayer <= 3 and table.passed1Stage: 
         table.stage1_player = False
         table.stage2_player = False
         table.stage3_player = True
 
-    if qtdMachine <= 3 and table.passed1Stage:
+    if qtdMachine <= 3 and table.machinePassed1Stage:
         table.stage1_machine = False
         table.stage2_machine = False
         table.stage3_machine = True
@@ -187,14 +189,13 @@ def setState():
         table.stage2_player = True
         table.stage3_player = False
 
-    if not (qtdMachine <= 3) and machinePassed1Stage:
+    if not (qtdMachine <= 3) and table.machinePassed1Stage:
         table.stage1_machine = False
         table.stage2_machine = True
         table.stage3_machine = False
 
-
-    print('player-',table.stage1_player, table.stage2_player, table.stage3_player)
-    print('machine-',table.stage1_machine, table.stage2_machine, table.stage3_machine)
+    print('player-', table.stage1_player,table.stage2_player,table.stage3_player)
+    print('machine-', table.stage1_machine,table.stage2_machine,table.stage3_machine)
 
 # Ação efetiva do jogo (player)
 def actionGame():
@@ -239,7 +240,7 @@ def actionGame():
                     gene.resetClone()
                     table.playerTurn = False
 
-            if table.stage3_machine:
+            if table.stage3_player:
                 position = table.getMark(mouse_x, mouse_y)
                 playerHere = gene.getChromosome()[position] == 1
                 freePositionToGo = gene.getClone()[position] == 3
@@ -318,15 +319,7 @@ while run:
     if delta >= timeToClick and canMoove == False:
         canMoove = True
 
-    if gene.getQtdPiecesPlayer() < 3 and table.passed1Stage:
-        gene.resetChromosome()
-        screen.blit(loser, (0,0))
-        
-    elif gene.getQtdPiecesMachine() < 3 and table.passed1Stage:
-        gene.resetChromosome()
-        screen.blit(win, (0,0))
-    else:
-        screen.blit(tabuleiro, (0,0))
+    screen.blit(tabuleiro, (0,0))
     
     # função que renderiza as peças do jogo 
     render(gene.getSizeChromosome(), gene.getChromosome(), gene.getClone())

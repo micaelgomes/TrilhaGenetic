@@ -34,20 +34,27 @@ def isMoveValidStage1(estado_atual,cromossomo, tupla, geracao):
             return True
     return False
 
-def isMoveValidStage2(estado_atual, cromossomo, tupla):
+def isMoveValidStage2(estado_atual, cromossomo, tupla, geracao):
     #linhas e qds são ambos de len = 2
     linhas = tupla[0]
     qds = tupla[1]
      #primeiro parametro é a posicao no estado atual e  
     pos = (linhas[0], qds[0])
     other_pos = (linhas[1], qds[1])
-    # print('pos ',pos, 'otherpos ', other_pos )
+    print('pos ',pos, 'otherpos ', other_pos )
     if isAdjacent(pos, other_pos):
         if estado_atual[pos[0]][pos[1]] == 2 and cromossomo[pos[0]][pos[1]] == 0:
             # print('ok')
             if estado_atual[other_pos[0]][other_pos[1]] == 0 and cromossomo[other_pos[0]][other_pos[1]]  == 2 :
                 print('MOVE IS VALID')
-                return True
+                if hasTrail(cromossomo, other_pos):
+                    return True
+                elif geracao > 300:
+                    if verifyInMat(cromossomo, other_pos):
+                        return True
+                    elif geracao > 400:
+                        return True
+                        
     return False
 
 def isMoveValidStage3(estado_atual, cromossomo, tupla, geracao):

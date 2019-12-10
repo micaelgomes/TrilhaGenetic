@@ -29,6 +29,7 @@ class Controller:
         
         # já passou do 1º estágio e dimininuio o número de peças
         self.passed1Stage = False
+        self.machinePassed1Stage = False
 
         # controlador de exclusão após trilha
         self.executeOrder66 = False
