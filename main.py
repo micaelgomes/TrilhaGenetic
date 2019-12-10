@@ -188,8 +188,7 @@ def actionGame():
                 if beFree:
                     gene.setPositionPlayer(position)
                     removeMark()
-                    table.playerHasMooved = True
-
+                    gene.setPositionMachine1stage()
 
             if table.stage2_player:
                 position = table.getMark(mouse_x, mouse_y)
@@ -215,17 +214,7 @@ def actionGame():
                     gene.setPositionPlayer(position)
                     gene.resetClone()
                     removeMark()
-                    table.playerHasMooved = True
-
-        # Controle de ação da Máquina
-        if not table.playerTurn:
-            if table.stage1_machine:
-                gene.setPositionMachine1stage()
-                table.playerHasMooved = False
-
-            if table.stage2_machine:
-                gene.setPositionMachine2stage()
-                table.playerHasMooved = False
+                    gene.setPositionMachine2stage()
     
     else:
         position = table.getMark(mouse_x, mouse_y)
@@ -241,7 +230,7 @@ def actionGame():
 run = True
 canMoove = True
 last_frame_move = pygame.time.get_ticks()
-timeToClick = 0.200
+timeToClick = 0.500
 
 while run:
 
@@ -286,12 +275,6 @@ while run:
     screen.blit(mark['img'], (mark['x'], mark['y']))
     screen.blit(close['img'], (close['x'], close['y']))
     screen.blit(kill['img'], (kill['x'], kill['y']))
-
-    if table.playerHasMooved: 
-        table.playerTurn = False
-        table.playerHasMooved = False
-    else:
-        table.playerTurn = True
 
     if table.playerTurn: screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
     else: screen.blit(stringMachine,(tabuleiro.get_width()-200, 35))
