@@ -155,11 +155,11 @@ class Genetico:
                 if value == 1:
                     listPosAdv.append((lin,col))
                 elif value == 2:
-                    listPosIA.apppend((lin,col))
+                    listPosIA.append((lin,col))
         removePos = gm.hasTupleAdj(listPosAdv)
-        if removePos:
+        if not removePos:
             removePos = gm.hasTupleAdjInLists(listPosAdv, listPosIA)
-        if removePos: 
+        if not removePos: 
             remonePos = rd.choice(listPosAdv)
         estado_atual_game[removePos[0]][removePos[1]] = 0
         return  ml.convertGameBoardInList(estado_atual_game)

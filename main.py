@@ -331,7 +331,9 @@ while run:
     setState()
 
     if table.isTrailPlayer(gene.getChromosome()): table.executeOrder66 = True
-    if table.isTrailMachine(gene.getChromosome()): print("Trilha Machine!!")
+    if table.isTrailMachine(gene.getChromosome()): 
+        print("Trilha Machine!!")
+        gene.removePiece()
 
     # checagem de trilha dupla
     table.disolveTrail(gene.getChromosome())
