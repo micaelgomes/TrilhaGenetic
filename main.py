@@ -116,7 +116,7 @@ def renderMark():
             close['x'] = table.getX(mouse_x) - 10
             close['y'] = table.getY(mouse_y) - 10
 
-        elif table.stage2_player and table.match(mouse_x, mouse_y) and hasOponent:
+        elif table.stage3_player and table.match(mouse_x, mouse_y) and hasOponent:
             close['x'] = table.getX(mouse_x) - 10
             close['y'] = table.getY(mouse_y) - 10
 
@@ -127,6 +127,8 @@ def renderMark():
 def removeMark():
     close['x'] = numOutScreen
     close['y'] = numOutScreen
+    mark['x'] = numOutScreen
+    mark['y'] = numOutScreen
 
 # render peças
 def render(qtd_pieces, pieces, clone):
@@ -203,6 +205,7 @@ def actionGame():
 
                 if beFree:
                     gene.setPositionPlayer(position)
+                    removeMark()
                     table.playerTurn = False
 
             if table.stage2_player:
@@ -227,6 +230,7 @@ def actionGame():
 
                 if freePositionToGo:
                     gene.setPositionPlayer(position)
+                    removeMark()
                     gene.resetClone()
                     table.playerTurn = False
 
@@ -240,11 +244,13 @@ def actionGame():
                     chromosome = gene.getChromosome()
 
                     for i in range(gene.getSizeChromosome()):
-                        if gene.getChromosome()[chromosome[i]] == 0:
-                            gene.setPossibleMovePlayer(i)
+                        if position != i:
+                            if gene.getChromosome()[chromosome[i]] == 0:
+                                gene.setPossibleMovePlayer(i)
 
                 if freePositionToGo:
                     gene.setPositionPlayer(position)
+                    removeMark()
                     gene.resetClone()
                     table.playerTurn = False
 
