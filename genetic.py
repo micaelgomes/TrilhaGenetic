@@ -41,7 +41,11 @@ class Genetic:
         if position >= 0 and position <= self.sizeChromosome:
             self.clone[position] = 3
 
-    def removePiece(self):
+    def removePiecePlayer(self, position):
+        if position >= 0 and position <= self.sizeChromosome:
+            self.chromosome[position] = 0
+
+    def removePieceMachine(self, position):
         g = Genetico(self.chromosome)
         self.chromosome = g.removePieceAdv(self.chromosome.copy())
     
