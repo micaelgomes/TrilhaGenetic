@@ -34,11 +34,38 @@ def convertListinGameBoard(lista):
     nova = []
     x_axis = 8
     y_axis = 3
-    cont = 0
+    linha, qd = 0,0
     for _i in range(x_axis):
-        nova.append(lista[cont:cont+y_axis])
-        cont += y_axis
+        nova.append(lista([],[],[]))
+    for i in range(9):
+        if i != 0 and i % 3 == 0:
+            linha += 1
+            qd = 0
+        nova[linha][qd] = lista[i]
+        qd += 1
+    j = 0
+    for i in range(9,12):
+        nova[7][j]= linha[i]
+        j+=1
+    j = 2
+    for i in range(12,15):
+        nova[3][j] = linha[i]
+        j-=1
+    linha, qd = 6, 0
+    for i in range(15,24):
+        if i != 15 and i % 3 == 0:
+            linha -=1
+            qd = 0
+        nova[linha][qd] = linha[i]
+        qd+=1
     return nova
+    # x_axis = 8
+    # y_axis = 3
+    # cont = 0
+    # for _i in range(x_axis):
+    #     nova.append(lista[cont:cont+y_axis])
+    #     cont += y_axis
+    # return nova
 
 def crateListRandomic(tam, minValue, maxValue):
     lista = []
@@ -58,10 +85,26 @@ def rankList(lista, pos_rank):
 
 def convertGameBoardInList(game):
     nova = []
-    for _,linhas in enumerate(game):
-        for _,value in enumerate(linhas):
-            nova.append(value)
+    x_axis = 8
+    y_axis = 3
+    for linha in range(3):
+        for qd in range(y_axis):
+            nova.append(game[linha][qd])
+    nova.append(game[7][0])
+    nova.append(game[7][1])
+    nova.append(game[7][2])
+    nova.append(game[3][2])
+    nova.append(game[3][1])
+    nova.append(game[3][0])
+    for linha in range(6,3,-1):
+        for qd in range(3):
+            nova.append(game[linha][qd])
     return nova
+
+    # for _,linhas in enumerate(game):
+    #     for _,value in enumerate(linhas):
+    #         nova.append(value)
+    # return nova
 
 if __name__ == "__main__":
     print(convertListinGameBoard([0,1,0, 2,0,1, 0,2,1, 1,2,2, 0,1,0, 2,1,1,2,2,0,1,0,2]))
