@@ -27,27 +27,34 @@ class Genetico:
         cromo_game = ml.convertListinGameBoard(cromossomo) #convertToGame(cromossomo)
         estado_atual_game = ml.convertListinGameBoard(self.estado_atual) #convertToGame(self.estado_atual)
         potencial = 0
+
         for i in range(8):
             if i % 2 != 0:
-                jogada = [cromo_game[i][0], cromo_game[i][1], cromo_game[i],[2] ]
+                jogada = [cromo_game[i][0], cromo_game[i][1], cromo_game[i][2]]
+
                 if  (2 in jogada) and ( cromo_game[i][0] == cromo_game[i][1] or cromo_game[i][0] == cromo_game[i][2] or cromo_game[i][1] == cromo_game[i][2] ):
                     potencial += 1
             if i % 2 == 0:
                 if i+2 != 8:
                     for j in range(3):
-                        jogada = [cromo_game[i][j], cromo_game[i+1][j], cromo_game[i+2][j] ]
+                        jogada = [cromo_game[i][j], cromo_game[i+1][j], cromo_game[i+2][j]]
+
                         if (2 in jogada) and (cromo_game[i][j] == cromo_game[i+1][j] or cromo_game[i][j] == cromo_game[i+2][j] or cromo_game[i+1][j] == cromo_game[i+2][j] ):
                             potencial += 1
                 else:
                     for j in range(3):
-                        jogada = [cromo_game[i][j], cromo_game[i+1][j], cromo_game[0][j] ]
+                        jogada = [cromo_game[i][j], cromo_game[i+1][j], cromo_game[0][j]]
                         if (2 in jogada) and (cromo_game[i][j] == cromo_game[i+1][j] or cromo_game[i][j] == cromo_game[0][j] or cromo_game[i+1][j] == cromo_game[0][j] ):
                             potencial += 1
+        
         value_discrepance = self.calcDiscrepance(estado_atual_game, cromo_game)
         fit = (5*value_discrepance + 2*potencial)/(5+2)
+        
         printTeste(f'discrepance :  {value_discrepance},  potencial value: {potencial},  fit:  {fit}', path=self.output,modoescrita = self.modoescrita )
+        
         return fit
     
+    # REPENSAR PQE 28 !
     def calcDiscrepance(self, cromo1, cromo2):
         # estabelece um valor para discrepancia
         tab_value = [2,1,0,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27]
@@ -132,7 +139,7 @@ class Genetico:
             if self.stage == 1 and len(ind_x)==1 and len(ind_y) == 1 and gm.isMoveValidStage1(estado_atual_game, cromo_game, (ind_x,ind_y), geracao):
                 self.result = cromo
                 return True
-            if self.stage == 2 and len(ind_x)==2 and len(ind_y)==2 and gm.isMoveValidStage2(estado_atual_game,cromo_game,(ind_x,ind_y)):
+            if self.stage == 2 and len(ind_x)==2 and len(ind_y)==2 and gm.isMoveValidStage2(estado_atual_game,cromo_game,(ind_x,ind_y), geracao):
                 self.result = cromo
                 return True
             if self.stage == 3 and len(ind_x)==2 and len(ind_y)==2 and gm.isMoveValidStage3(estado_atual_game,cromo_game,(ind_x,ind_y), geracao):
@@ -160,8 +167,6 @@ class Genetico:
         if not removePos:
             removePos = gm.hasTupleAdjInLists(listPosAdv, listPosIA)
         if not removePos: 
-            remonePos = rd.choice(listPosAdv)
+            removePos = rd.choice(listPosAdv)
         estado_atual_game[removePos[0]][removePos[1]] = 0
         return  ml.convertGameBoardInList(estado_atual_game)
-
-
