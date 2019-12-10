@@ -26,6 +26,9 @@ class Controller:
 
         # Controlador de Turnos
         self.playerTurn = True
+        
+        # já passou do 1º estágio e dimininuio o número de peças
+        self.passed1Stage = False
 
         # controlador de exclusão após trilha
         self.executeOrder66 = False
@@ -35,6 +38,10 @@ class Controller:
         self.trailMachine = np.zeros((self.qtdPoints, self.qtdPoints, self.qtdPoints))
         self.setTrailPositionsPlayer()
         self.setTrailPositionsMachine()
+
+        # last trail
+        self.lastTrailPlayer = []
+        self.lastTrailMachine = []
 
     def getNeighbor(self, i):
         if i >= 0 and i <= self.qtdPoints:
@@ -116,30 +123,69 @@ class Controller:
         for i in range(self.qtdPoints):
             for j in range(self.qtdPoints):
                 for k in range(self.qtdPoints):
-                    if self.trailPlayer[i][j][k] == 1:
-                        if chromosome[i] == 1 and chromosome[j] == 1 and chromosome[k] == 1:
-                            self.trailPlayer[i][j][k] = 0
-                            return True
+                    if self.trailPlayer[i][j][k] != 0:
+
+                        if self.trailPlayer[i][j][k] == 1:
+                            if chromosome[i] == 1 and chromosome[j] == 1 and chromosome[k] == 1:
+                                last = i, j, k
+                                self.lastTrailPlayer.append(last)
+                                self.trailPlayer[i][j][k] = 2
+                                return True
+                        else:
+                            self.trailPlayer[i][j][k] = 2
+
         return False
                             
     def isTrailMachine(self, chromosome):
         for i in range(self.qtdPoints):
             for j in range(self.qtdPoints):
                 for k in range(self.qtdPoints):
-                    if self.trailPlayer[i][j][k] == 1:
-                        if chromosome[i] == 1 and chromosome[j] == 1 and chromosome[k] == 1:
-                            self.trailPlayer[i][j][k] = 0
-                            return True
+                    if self.trailMachine[i][j][k] != 0:
+                        if self.trailMachine[i][j][k] == 1:
+                            if chromosome[i] == 2 and chromosome[j] == 2 and chromosome[k] == 2:
+                                last = i, j, k
+                                self.lastTrailMachine.append(last) 
+                                self.trailMachine[i][j][k] = 2
+                                return True
+                        else:
+                            self.trailMachine[i][j][k] = 2
         return False
+
+    def disolveTrail(self, chromosome):
+        tmpNewTrailPlayer = []
+        tmpNewTrailMachine = []
+
+        for i in range(len(self.lastTrailPlayer)):
+            k = self.lastTrailPlayer[i]
+            if not (chromosome[k[0]] == 1 and chromosome[k[1]] == 1 and chromosome[k[2]] == 1):
+                self.trailPlayer[k[0]][k[1]][k[2]] = 1
+            else:
+                tmpNewTrailPlayer.append(self.lastTrailPlayer[i])
+
+        for i in range(len(self.lastTrailMachine)):
+            k = self.lastTrailMachine[i]
+            if not (chromosome[k[0]] == 2 and chromosome[k[1]] == 2 and chromosome[k[2]] == 2):
+                self.trailMachine[k[0]][k[1]][k[2]] = 1
+            else:
+                tmpNewTrailMachine.append(self.lastTrailMachine[i])
+
+        self.lastTrailPlayer = tmpNewTrailPlayer
+        self.lastTrailMachine = tmpNewTrailMachine
+
 
 def main():
     control = Controller()
     
-    print(control.trailPlayer[0][3][6])
+    k = 3 
+    i = 1
+    j = 2
 
-    # matriz de interesse
-    # print(control.match(290, 390))
-    # print(control.getMarkPosition(3))
+    last = k, i, j      
+
+    control.lastTrailPlayer.append(last)
+
+
+    print(len(control.lastTrailPlayer[0]))
 
 
 if __name__ == "__main__":
