@@ -177,17 +177,8 @@ class Controller:
 
 def main():
     control = Controller()
-    
-    k = 3 
-    i = 1
-    j = 2
 
-    last = k, i, j      
-
-    control.lastTrailPlayer.append(last)
-
-
-    print(len(control.lastTrailPlayer[0]))
+    print(control.neighbor[4])
 
 
 if __name__ == "__main__":

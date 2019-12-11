@@ -149,16 +149,18 @@ def render(qtd_pieces, pieces, clone):
             position = table.getXY(i)
             screen.blit(big_mark['img'], (position[0]-diff, position[1]-diff))
 
+    # print(pieces)
+
 # Define em qual estágio o jogo se encontra
 def setState():
     qtdPlayer = gene.getQtdPiecesPlayer()
     qtdMachine = gene.getQtdPiecesMachine()
 
     # variável de teste de fase 
-    # table.passed1Stage = True
-    # table.machinePassed1Stage = True
-    # gene.qtdFixedPlayer = 9
-    # gene.qtdFixedMachine = 9
+    table.passed1Stage = True
+    table.machinePassed1Stage = True
+    gene.qtdFixedPlayer = 9
+    gene.qtdFixedMachine = 9
 
     if gene.qtdFixedPlayer <= 9 and not table.passed1Stage:
         table.stage1_player = True
@@ -295,6 +297,8 @@ last_frame_move = pygame.time.get_ticks()
 timeToClick = 0.500
 pygame.mixer.music.play()
 finish = False
+loserStatus = False
+winStatus = False
 
 while run:
 
@@ -320,7 +324,17 @@ while run:
     if delta >= timeToClick and canMoove == False:
         canMoove = True
 
-    screen.blit(tabuleiro, (0,0))
+    if gene.getQtdPiecesOutside() == 0 and (gene.getQtdPiecesPlayer() < 3 or gene.getQtdPiecesMachine() < 3):
+        finish = True
+
+    if loserStatus and finish: 
+        gene.resetChromosome()
+        screen.blit(loser, (0,0))
+    if winStatus and finish: 
+        gene.resetChromosome()
+        screen.blit(win, (0,0))
+    else: 
+        screen.blit(tabuleiro, (0,0))
     
     # função que renderiza as peças do jogo 
     render(gene.getSizeChromosome(), gene.getChromosome(), gene.getClone())
@@ -333,9 +347,17 @@ while run:
 
     if table.isTrailPlayer(gene.getChromosome()): 
         print("Trilha Player!!")
+        
+        if gene.getQtdPiecesMachine() <= 3:
+            winStatus = True
+
         table.executeOrder66 = True
     if table.isTrailMachine(gene.getChromosome()): 
         print("Trilha Machine!!")
+        
+        if gene.getQtdPiecesPlayer() <= 3:
+            loserStatus = True
+
         gene.removePieceMachine()
 
     # checagem de trilha dupla
@@ -345,7 +367,9 @@ while run:
     screen.blit(close['img'], (close['x'], close['y']))
     screen.blit(kill['img'], (kill['x'], kill['y']))
 
-    screen.blit(stringVamos,(tabuleiro.get_width()-200, 35))
+    if not finish:
+        screen.blit(stringVamos,(tabuleiro.get_width()-200, 35))
+    
     # if table.playerTurn and not finish: screen.blit(stringPlayer,(tabuleiro.get_width()-200, 35))
     # elif not table.playerTurn and not finish: screen.blit(stringMachine,(tabuleiro.get_width()-200, 35))
 

@@ -7,11 +7,15 @@ import numpy as np
 class Genetic:
     def __init__(self):
         self.sizeChromosome = 24
-        # Random
+        # Middle
         # self.chromosome = [1,2,1,0,2,0,1,0,1,2,1,2,1,2,0,0,2,2,1,2,1,1,0,2]
-        # self.chromosome = [0,2,0,0,0,0,2,0,1,0,1,0,2,2,0,0,2,1,2,2,0,0,0,0]
+        
+        # End
+        self.chromosome = [0,1,0,0,0,0,1,0,2,0,2,0,1,1,0,0,1,2,1,1,0,0,0,0]
+        
         # start
-        self.chromosome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        # self.chromosome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
         self.clone = self.chromosome[:]
 
         self.qtdFixedPlayer = 1
@@ -86,6 +90,16 @@ class Genetic:
 
         return qtd
 
+    def getQtdPiecesOutside(self):
+        qtd = 0
+        # print(self.clone)
+
+        for i in range(self.sizeChromosome):
+            if self.clone[i] == 3:
+                qtd = qtd + 1
+
+        return qtd
+        
 def main():
     print('genetic works!')
 
