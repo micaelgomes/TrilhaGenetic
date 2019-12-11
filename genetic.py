@@ -2,30 +2,60 @@
 Algoritmo Genético do Jogo
 '''
 from genetico import Genetico
-
+import numpy as np
 
 class Genetic:
     def __init__(self):
-        self.sizeChromosome = 27
-        # Random
-        # self.chromosome = [1,1,0,1,2,0,1,0,1,2,1,2,1,2,0,0,0,2,1,2,0,2,0,2,0,2,1]
+        self.sizeChromosome = 24
+        # Middle
+        # self.chromosome = [1,2,1,0,2,0,1,0,1,2,1,2,1,2,0,0,2,2,1,2,1,1,0,2]
+        
+        # End
+        self.chromosome = [0,1,0,0,0,0,1,0,2,0,2,0,1,1,0,0,1,2,1,1,0,0,0,0]
+        
         # start
-        self.chromosome = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        # begin 2nd stage
-        # self.chromosome = [2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1]
+        # self.chromosome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+        self.clone = self.chromosome[:]
+
+        self.qtdFixedPlayer = 1
+        self.qtdFixedMachine = 1
 
     def getChromosome(self):
         return self.chromosome
 
+    def getClone(self):
+        return self.clone
+
+    def resetClone(self):
+        self.clone = self.chromosome[:]
+
+    def resetChromosome(self):
+        self.chromosome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
+    def getSizeChromosome(self):
+        return self.sizeChromosome
+
     def setPositionPlayer(self, position):
-        if position >= 0 and position <= 27:
+        if position >= 0 and position <= self.sizeChromosome:
             self.chromosome[position] = 1
 
-    def removePiece(self, position):
-        if position >= 0 and position <= 27:
+    def kill1PieceMachine(self, position):
+        if position >= 0 and position <= self.sizeChromosome:
             self.chromosome[position] = 0
 
+    def setPossibleMovePlayer(self, position):
+        if position >= 0 and position <= self.sizeChromosome:
+            self.clone[position] = 3
+
+    def removePiecePlayer(self, position):
+        if position >= 0 and position <= self.sizeChromosome:
+            self.chromosome[position] = 0
+
+    def removePieceMachine(self):
+        g = Genetico(self.chromosome)
+        self.chromosome = g.removePieceAdv(self.chromosome.copy())
+    
     def setPositionMachine1stage(self):
         g = Genetico(self.chromosome, stage=1)
         solution, _geracao = g.initAlg()
@@ -54,88 +84,24 @@ class Genetic:
     def getQtdPiecesMachine(self):
         qtd = 0
 
-        for i in range(27):
+        for i in range(self.sizeChromosome):
             if self.chromosome[i] == 2:
                 qtd = qtd + 1
 
         return qtd
 
-    def isTrailPlayer(self):
-        if self.chromosome[0] == 1 and self.chromosome[3] == 1 and self.chromosome[6] == 1:
-            return True
-        elif self.chromosome[1] == 1 and self.chromosome[4] == 1 and self.chromosome[7] == 1:
-            return True
-        elif self.chromosome[2] == 1 and self.chromosome[5] == 1 and self.chromosome[8] == 1:
-            return True
-        elif self.chromosome[6] == 1 and self.chromosome[17] == 1 and self.chromosome[24] == 1:
-            return True
-        elif self.chromosome[7] == 1 and self.chromosome[16] == 1 and self.chromosome[25] == 1:
-            return True
-        elif self.chromosome[8] == 1 and self.chromosome[15] == 1 and self.chromosome[26] == 1:
-            return True
-        elif self.chromosome[18] == 1 and self.chromosome[21] == 1 and self.chromosome[24] == 1:
-            return True
-        elif self.chromosome[19] == 1 and self.chromosome[22] == 1 and self.chromosome[25] == 1:
-            return True
-        elif self.chromosome[20] == 1 and self.chromosome[23] == 1 and self.chromosome[26] == 1:
-            return True
-        elif self.chromosome[0] == 1 and self.chromosome[9] == 1 and self.chromosome[18] == 1:
-            return True
-        elif self.chromosome[1] == 1 and self.chromosome[10] == 1 and self.chromosome[19] == 1:
-            return True
-        elif self.chromosome[2] == 1 and self.chromosome[11] == 1 and self.chromosome[20] == 1:
-            return True
-        elif self.chromosome[3] == 1 and self.chromosome[4] == 1 and self.chromosome[5] == 1:
-            return True
-        elif self.chromosome[15] == 1 and self.chromosome[16] == 1 and self.chromosome[17] == 1:
-            return True
-        elif self.chromosome[21] == 1 and self.chromosome[22] == 1 and self.chromosome[23] == 1:
-            return True
-        elif self.chromosome[9] == 1 and self.chromosome[10] == 1 and self.chromosome[11] == 1:
-            return True
-        else:
-            return False
+    def getQtdPiecesOutside(self):
+        qtd = 0
+        # print(self.clone)
 
-    def isTrailMachine(self):
-        if self.chromosome[0] == 2 and self.chromosome[3] == 2 and self.chromosome[6] == 2:
-            return True
-        elif self.chromosome[1] == 2 and self.chromosome[4] == 2 and self.chromosome[7] == 2:
-            return True
-        elif self.chromosome[2] == 2 and self.chromosome[5] == 2 and self.chromosome[8] == 2:
-            return True
-        elif self.chromosome[6] == 2 and self.chromosome[17] == 2 and self.chromosome[24] == 2:
-            return True
-        elif self.chromosome[7] == 2 and self.chromosome[16] == 2 and self.chromosome[25] == 2:
-            return True
-        elif self.chromosome[8] == 2 and self.chromosome[15] == 2 and self.chromosome[26] == 2:
-            return True
-        elif self.chromosome[18] == 2 and self.chromosome[21] == 2 and self.chromosome[24] == 2:
-            return True
-        elif self.chromosome[19] == 2 and self.chromosome[22] == 2 and self.chromosome[25] == 2:
-            return True
-        elif self.chromosome[20] == 2 and self.chromosome[23] == 2 and self.chromosome[26] == 2:
-            return True
-        elif self.chromosome[0] == 2 and self.chromosome[9] == 2 and self.chromosome[18] == 2:
-            return True
-        elif self.chromosome[1] == 2 and self.chromosome[10] == 2 and self.chromosome[19] == 2:
-            return True
-        elif self.chromosome[2] == 2 and self.chromosome[11] == 2 and self.chromosome[20] == 2:
-            return True
-        elif self.chromosome[3] == 2 and self.chromosome[4] == 2 and self.chromosome[5] == 2:
-            return True
-        elif self.chromosome[15] == 2 and self.chromosome[16] == 2 and self.chromosome[17] == 2:
-            return True
-        elif self.chromosome[21] == 2 and self.chromosome[22] == 2 and self.chromosome[23] == 2:
-            return True
-        elif self.chromosome[9] == 2 and self.chromosome[10] == 2 and self.chromosome[11] == 2:
-            return True
-        else:
-            return False
+        for i in range(self.sizeChromosome):
+            if self.clone[i] == 3:
+                qtd = qtd + 1
 
-
+        return qtd
+        
 def main():
     print('genetic works!')
-
 
 if __name__ == "__main__":
     main()
